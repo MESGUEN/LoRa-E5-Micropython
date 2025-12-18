@@ -40,7 +40,7 @@ class LoRaE5:
                     buf.extend(data)
                     txt = bytes(buf).decode("ascii", "ignore").lower()
 
-                    if "already joined" in txt or "joined" in txt:
+                    if "joined already" in txt or "joined" in txt:
                         result = "JOIN"
                         break
                     if "failed" in txt:
@@ -86,3 +86,4 @@ class LoRaE5:
         if not saw_any:
             return "TIMEOUT"
         return "DONE"
+
