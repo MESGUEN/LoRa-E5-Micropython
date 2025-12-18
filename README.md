@@ -7,23 +7,6 @@ It focuses on the essentials needed in IoT projects:
 - Perform LoRaWAN join (`join_ok`)
 - Send an uplink with hex payload and optionally receive a downlink (`send_payload_hex`)
 
-This module is designed to integrate nicely with an **application state machine** (INIT / CONFIG / JOIN / MEASURE / TX).
-
----
-
-## Features
-
-- **Simple API** (small number of methods)
-- **Non-blocking style loops with timeouts** (no long `sleep(600)`)
-- Handles typical LoRa-E5 responses including:
-  - `"joined"` / `"already joined"`
-  - `"failed"`
-  - `"Please join network first"` (NOT_JOINED)
-  - `"RX "...""` downlink extraction (hex)
-  - `"Done"`
-- Return codes are **explicit strings** (easy to use in a state machine)
-
----
 
 ## Requirements
 
@@ -31,17 +14,13 @@ This module is designed to integrate nicely with an **application state machine*
 - A UART object created with `machine.UART`
 - LoRa-E5 wired correctly (TX/RX crossed, common GND)
 
-> Note: On MicroPython, file and import names are case-sensitive.  
-> If your file is named `LoraE5.py`, import it as `from LoraE5 import LoRaE5`.
-
----
 
 ## Installation
 
-Copy `LoraE5.py` to your board filesystem, for example:
+Copy `LoRaE5.py` to your board filesystem, for example:
 
-- `/LoraE5.py`
-- or `/lib/LoraE5.py`
+- `/LoRaE5.py`
+- or `/lib/LoRaE5.py`
 
 Then import it in your script.
 
@@ -64,7 +43,7 @@ Sends `AT+JOIN` and returns:
 - `"FAILED"` if the word `failed` appears
 - `"TIMEOUT"` otherwise
 
-### `send_payload_hex(hex_payload, timeout_ms=8000) -> str`
+### `send_payload_hex(hex_payload, timeout_ms=10000) -> str`
 Sends `AT+MSGHEX="..."` and returns:
 - `"NOT_JOINED"` if the module is not joined (ex: `Please join network first`)
 - `"<DOWNLINK_HEX>"` if a downlink was received (returns the hex string between quotes after `RX`)
@@ -76,11 +55,30 @@ Sends `AT+MSGHEX="..."` and returns:
 ## Quick Start
 
 ```python
+import time
 from machine import UART
-from LoraE5 import LoRaE5
+from LoRaE5 import LoRaE5
 
-uart = UART(1, baudrate=9600, tx=5, rx=4)   # adapt pins/UART id to your board
+uart = UART(1, baudrate=9600, tx=5, rx=4)
 e5 = LoRaE5(uart)
 
-# Ping the module
-print(e5.send_at("AT"))   # 1 if response received, else 0
+# --- LoRaWAN configuration
+e5.send_at("AT+MODE=LWOTAA")
+e5.send_at("AT+DR=EU868")
+e5.send_at("AT+CH=NUM,0-2")
+e5.send_at('AT+KEY=APPKEY,"YOUR_APPKEY_HERE"')
+e5.send_at("AT+CLASS=A")
+e5.send_at("AT+PORT=8")
+e5.send_at("AT+LW=JDC,OFF")
+
+# --- Join loop ---
+while True:
+    status = e5.join_ok()
+    print("JOIN:", status)
+    if status == "JOIN":
+        break
+    time.sleep(30)
+
+# --- Send a test payload (hex) ---
+print("TX:", e5.send_payload_hex("01020304"))
+
