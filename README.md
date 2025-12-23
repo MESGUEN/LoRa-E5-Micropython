@@ -82,5 +82,5 @@ while True:
     sleep(30)
 
 # --- Send a test payload (hex) ---
-print("TX:", e5.send_payload_hex("01020304"))
+e5.send_payload_hex("01020304")
 
