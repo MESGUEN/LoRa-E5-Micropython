@@ -55,14 +55,16 @@ Sends `AT+MSGHEX="..."` and returns:
 ## Quick Start
 
 ```python
-import time
+from time import sleep
 from machine import UART
 from LoRaE5 import LoRaE5
 
 uart = UART(1, baudrate=9600, tx=5, rx=4)
+sleep(1)    # 1s delay to let the LoRa-E5 module boot
 e5 = LoRaE5(uart)
 
 # --- LoRaWAN configuration
+e5.send_at("AT+RESET")
 e5.send_at("AT+MODE=LWOTAA")
 e5.send_at("AT+DR=EU868")
 e5.send_at("AT+CH=NUM,0-2")
@@ -77,7 +79,7 @@ while True:
     print("JOIN:", status)
     if status == "JOIN":
         break
-    time.sleep(30)
+    sleep(30)
 
 # --- Send a test payload (hex) ---
 print("TX:", e5.send_payload_hex("01020304"))
