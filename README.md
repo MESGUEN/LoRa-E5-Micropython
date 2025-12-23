@@ -78,7 +78,7 @@ while True:
     status = e5.join_ok()
     if status == "JOIN":
         break
-    print("Wait 30s before retry")
+    print("Waiting 30s before retry")
     sleep(30)
 
 # --- Send a test payload (hex) ---
