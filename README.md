@@ -76,9 +76,9 @@ e5.send_at("AT+LW=JDC,OFF")
 # --- Join loop ---
 while True:
     status = e5.join_ok()
-    print("JOIN:", status)
     if status == "JOIN":
         break
+    print("Wait 30s before retry")
     sleep(30)
 
 # --- Send a test payload (hex) ---
