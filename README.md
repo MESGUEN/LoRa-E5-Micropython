@@ -64,7 +64,7 @@ sleep(1)    # 1s delay to let the LoRa-E5 module boot
 e5 = LoRaE5(uart)
 
 # --- LoRaWAN configuration
-e5.send_at("AT+DEFAULT")
+e5.send_at("AT+FDEFAULT")
 e5.send_at("AT+RESET")
 e5.send_at("AT+MODE=LWOTAA")
 e5.send_at("AT+DR=EU868")
