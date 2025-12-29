@@ -64,6 +64,7 @@ sleep(1)    # 1s delay to let the LoRa-E5 module boot
 e5 = LoRaE5(uart)
 
 # --- LoRaWAN configuration
+e5.send_at("AT+DEFAULT")
 e5.send_at("AT+RESET")
 e5.send_at("AT+MODE=LWOTAA")
 e5.send_at("AT+DR=EU868")
@@ -76,7 +77,7 @@ e5.send_at("AT+LW=JDC,OFF")
 # --- Join loop ---
 while True:
     status = e5.join_ok()
-    if status == "JOIN":
+    if status == "JOINED":
         break
     print("Waiting 30s before retry")
     sleep(30)
